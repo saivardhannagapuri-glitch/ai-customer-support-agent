@@ -1,14 +1,12 @@
 
 import streamlit as st
-import requests
+from src.langgraph_agent import graph
 
 st.set_page_config(
     page_title="AI Customer Support Agent",
     page_icon="💬",
     layout="centered"
 )
-
-API_URL = "http://127.0.0.1:8000/ask"
 
 st.title("💬 AI Customer Support Agent")
 st.caption(
@@ -53,24 +51,27 @@ if question:
     with st.chat_message("assistant"):
         with st.spinner("Finding the best answer..."):
             try:
-                response = requests.post(
-                    API_URL,
-                    json={"question": question},
-                    timeout=120
-                )
-                response.raise_for_status()
-                data = response.json()
+                result = graph.invoke({
+                    "question": question,
+                    "route": "",
+                    "retrieved_documents": [],
+                    "answer": "",
+                    "sources": []
+                })
 
-                answer = data.get(
+                answer = result.get(
                     "answer",
                     "Sorry, I couldn't find an answer."
                 )
-                sources = data.get("sources", [])
+                sources = result.get("sources", [])
 
-            except requests.RequestException:
+            except Exception:
+                st.error(
+                    "The support agent encountered an error. "
+                    "Please check the app logs."
+                )
                 answer = (
-                    "I couldn't connect to the support service. "
-                    "Please make sure the API server is running."
+                    "Sorry, I couldn't process your question right now."
                 )
                 sources = []
 
@@ -81,7 +82,7 @@ if question:
                     for source in sources:
                         st.write(f"- {source}")
 
-    # Save the assistant response in conversation history
+    # Save the assistant response
     st.session_state.messages.append({
         "role": "assistant",
         "content": answer,
