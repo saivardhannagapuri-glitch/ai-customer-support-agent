@@ -1,0 +1,31 @@
+AI Customer Support FAQ
+
+1. How can I reset my password?
+Customers can reset their password by clicking "Forgot Password" on the login page. They will receive a password-reset link on their registered email address.
+
+2. How can I contact customer support?
+Customers can contact support through the support email or by creating a support ticket through the customer portal.
+
+3. What are the customer support hours?
+Customer support is available Monday to Friday, from 9:00 AM to 6:00 PM.
+
+4. How can I check my order status?
+Customers can check their order status by logging into their account and opening the "My Orders" section.
+
+5. Can I cancel my order?
+An order can be cancelled before it is shipped. Once the order has been shipped, cancellation may not be possible.
+
+6. How can I request a refund?
+Customers can submit a refund request through the customer portal. The support team will review the request according to the refund policy.
+
+7. How long does a refund take?
+Approved refunds are generally processed within 5 to 7 business days.
+
+8. How can I update my email address?
+Customers can update their email address from the Account Settings section. For security reasons, verification may be required.
+
+9. What should I do if my account is locked?
+Customers should contact customer support if their account is locked. The support team will verify the account and help restore access.
+
+10. Does the support agent answer questions outside the company information?
+The AI Customer Support Agent is designed to answer questions related to the company's products, services, policies, and support information. It should not answer unrelated general questions.
