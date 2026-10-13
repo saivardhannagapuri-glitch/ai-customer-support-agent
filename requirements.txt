@@ -1,4 +1,12 @@
+streamlit
 python-dotenv
+langchain
+langchain-core
+langchain-google-genai
 langchain-text-splitters
+langgraph
 sentence-transformers
 faiss-cpu
+fastapi
+uvicorn
+requests
