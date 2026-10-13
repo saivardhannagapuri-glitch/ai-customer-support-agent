@@ -5,7 +5,7 @@ from src.langgraph_agent import graph
 st.set_page_config(
     page_title="AI Customer Support Agent",
     page_icon="💬",
-    layout="centered"
+    layout="centered",
 )
 
 st.title("💬 AI Customer Support Agent")
@@ -17,7 +17,7 @@ st.caption(
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Sidebar controls
+# Sidebar
 with st.sidebar:
     st.subheader("Conversation")
     st.write(f"Messages: {len(st.session_state.messages)}")
@@ -26,65 +26,90 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
-# Display previous messages
+# Display conversation history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.write(message["content"])
+        st.markdown(message["content"])
 
-        if message.get("sources"):
+        sources = message.get("sources", [])
+        if sources:
             with st.expander("📚 Sources"):
-                for source in message["sources"]:
-                    st.write(f"- {source}")
+                for source in sources:
+                    st.markdown(f"- {source}")
 
-# Accept a new question
-question = st.chat_input("Type your question here...")
+# Chat input
+question = st.chat_input("Ask a customer support question...")
 
 if question:
+    # Display and save the user's question
     st.session_state.messages.append({
         "role": "user",
-        "content": question
+        "content": question,
     })
 
     with st.chat_message("user"):
-        st.write(question)
+        st.markdown(question)
 
+    # Generate the assistant response
     with st.chat_message("assistant"):
         with st.spinner("Finding the best answer..."):
             try:
                 result = graph.invoke({
                     "question": question,
-                    "route": "",
                     "retrieved_documents": [],
                     "answer": "",
-                    "sources": []
+                    "sources": [],
                 })
 
-                answer = result.get(
-                    "answer",
+                answer = result.get("answer") or (
                     "Sorry, I couldn't find an answer."
                 )
-                sources = result.get("sources", [])
+                sources = result.get("sources") or []
 
-            except Exception:
-                st.error(
-                    "The support agent encountered an error. "
-                    "Please check the app logs."
+                # Normalize sources for display
+                sources = [
+                    str(source).strip()
+                    for source in sources
+                    if source and str(source).strip()
+                ]
+
+            except Exception as error:
+                error_message = str(error)
+
+                print(
+                    f"Customer support agent error: {error_message}"
                 )
-                answer = (
-                    "Sorry, I couldn't process your question right now."
-                )
+
+                # Handle Gemini API quota errors
+                if (
+                    "RESOURCE_EXHAUSTED" in error_message
+                    or "429" in error_message
+                    or "quota" in error_message.lower()
+                ):
+                    answer = (
+                        "The AI support service has temporarily "
+                        "reached its usage limit. Please try again "
+                        "later. Your question has not been processed."
+                    )
+                else:
+                    answer = (
+                        "The support agent couldn't process this "
+                        "request. Please try again later. If the "
+                        "issue continues, contact customer support."
+                    )
+
                 sources = []
 
-            st.write(answer)
+        st.markdown(answer)
 
-            if sources:
-                with st.expander("📚 Sources"):
-                    for source in sources:
-                        st.write(f"- {source}")
+        if sources:
+            with st.expander("📚 Sources"):
+                for source in sources:
+                    st.markdown(f"- {source}")
 
-    # Save the assistant response
+    # Save the complete assistant response
     st.session_state.messages.append({
         "role": "assistant",
         "content": answer,
-        "sources": sources
+        "sources": sources,
     })
