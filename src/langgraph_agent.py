@@ -51,7 +51,7 @@ TOP_K = 2
 DISTANCE_THRESHOLD = 1.0
 
 
-# 5. Prompt with stronger guardrails
+# 5. Prompt with security guardrails
 prompt = ChatPromptTemplate.from_messages([
     (
         "system",
@@ -126,11 +126,22 @@ def retrieve_documents(state: AgentState):
         if distance <= DISTANCE_THRESHOLD:
             relevant_documents.append(document)
 
+    # Extract readable FAQ source titles
     sources = []
 
     for document in relevant_documents:
-        first_line = document.page_content.splitlines()[0].strip()
-        sources.append(first_line)
+        lines = [
+            line.strip()
+            for line in document.page_content.splitlines()
+            if line.strip()
+        ]
+
+        source_title = next(
+            (line for line in lines if "?" in line),
+            lines[0] if lines else "Company FAQ"
+        )
+
+        sources.append(source_title)
 
     print("Relevant documents:", len(relevant_documents))
     print("Sources:", sources)
@@ -222,9 +233,9 @@ builder.add_edge("fallback", END)
 graph = builder.compile()
 
 
-# 12. Run the agent directly for a quick test
+# 12. Run a quick test
 if __name__ == "__main__":
-    question = "What is the capital of India?"
+    question = "How can I reset my password?"
 
     result = graph.invoke({
         "question": question,

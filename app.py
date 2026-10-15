@@ -105,7 +105,7 @@ if question:
         if sources:
             with st.expander("📚 Sources"):
                 for source in sources:
-                    st.markdown(f"- {source}")
+                    st.markdown(f"• {source}")
 
     # Save the complete assistant response
     st.session_state.messages.append({
